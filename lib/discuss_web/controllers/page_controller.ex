@@ -10,8 +10,8 @@ defmodule DiscussWeb.PageController do
   """
 
   def home(conn, _params) do
-    # fetch the latest 5 topics, ordered by insertion time descending
-    topics = Content.recent_topics(5)
+    # fetch the latest 6 topics, ordered by insertion time descending
+    topics = Content.recent_topics(6)
 
     # Render the home.html.heex template, passing topics: topics
     render(conn, :home, topics: topics)

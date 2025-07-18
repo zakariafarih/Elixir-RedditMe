@@ -597,6 +597,205 @@ defmodule DiscussWeb.CoreComponents do
     """
   end
 
+  @doc """
+  Renders pagination controls with modern design.
+  """
+  attr :pagination, :map, required: true
+  attr :path_func, :any, required: true
+  attr :params, :map, default: %{}
+  attr :class, :string, default: ""
+
+  def pagination(assigns) do
+    ~H"""
+    <div class={"flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg shadow-sm #{@class}"}>
+      <div class="flex flex-1 justify-between sm:hidden">
+        <!-- Mobile pagination -->
+        <%= if @pagination.has_prev do %>
+          <.link
+            navigate={@path_func.(Map.put(@params, "page", @pagination.prev_page))}
+            class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Previous
+          </.link>
+        <% else %>
+          <span class="relative inline-flex items-center rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+            Previous
+          </span>
+        <% end %>
+
+        <%= if @pagination.has_next do %>
+          <.link
+            navigate={@path_func.(Map.put(@params, "page", @pagination.next_page))}
+            class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Next
+          </.link>
+        <% else %>
+          <span class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+            Next
+          </span>
+        <% end %>
+      </div>
+
+      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing
+            <span class="font-medium"><%= (@pagination.page - 1) * @pagination.per_page + 1 %></span>
+            to
+            <span class="font-medium">
+              <%= min(@pagination.page * @pagination.per_page, @pagination.total_count) %>
+            </span>
+            of
+            <span class="font-medium"><%= @pagination.total_count %></span>
+            results
+          </p>
+        </div>
+
+        <div>
+          <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            <!-- Previous button -->
+            <%= if @pagination.has_prev do %>
+              <.link
+                navigate={@path_func.(Map.put(@params, "page", @pagination.prev_page))}
+                class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+              >
+                <span class="sr-only">Previous</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                </svg>
+              </.link>
+            <% else %>
+              <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-300 ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                <span class="sr-only">Previous</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                </svg>
+              </span>
+            <% end %>
+
+            <!-- Page numbers -->
+            <%= for page_num <- pagination_range(@pagination.page, @pagination.total_pages) do %>
+              <%= if page_num == :ellipsis do %>
+                <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>
+              <% else %>
+                <%= if page_num == @pagination.page do %>
+                  <span class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    <%= page_num %>
+                  </span>
+                <% else %>
+                  <.link
+                    navigate={@path_func.(Map.put(@params, "page", page_num))}
+                    class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                  >
+                    <%= page_num %>
+                  </.link>
+                <% end %>
+              <% end %>
+            <% end %>
+
+            <!-- Next button -->
+            <%= if @pagination.has_next do %>
+              <.link
+                navigate={@path_func.(Map.put(@params, "page", @pagination.next_page))}
+                class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+              >
+                <span class="sr-only">Next</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                </svg>
+              </.link>
+            <% else %>
+              <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-300 ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                <span class="sr-only">Next</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                </svg>
+              </span>
+            <% end %>
+          </nav>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders sorting controls for topic lists.
+  """
+  attr :current_sort, :atom, default: :inserted_at
+  attr :current_order, :atom, default: :desc
+  attr :path_func, :any, required: true
+  attr :params, :map, default: %{}
+  attr :class, :string, default: ""
+
+  def sorting_controls(assigns) do
+    ~H"""
+    <div class={"flex items-center space-x-4 #{@class}"}>
+      <span class="text-sm text-gray-700 font-medium">Sort by:</span>
+
+      <div class="flex items-center space-x-2">
+        <%= for {label, field} <- [{"Latest", :inserted_at}, {"Title", :title}, {"Updated", :updated_at}] do %>
+          <.link
+            navigate={@path_func.(Map.merge(@params, %{"sort_by" => field, "sort_order" => if(@current_sort == field && @current_order == :asc, do: :desc, else: :asc), "page" => 1}))}
+            class={[
+              "inline-flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+              if(@current_sort == field, do: "bg-indigo-100 text-indigo-700 font-medium", else: "text-gray-600 hover:bg-gray-100")
+            ]}
+          >
+            <%= label %>
+            <%= if @current_sort == field do %>
+              <%= if @current_order == :asc do %>
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+              <% else %>
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              <% end %>
+            <% end %>
+          </.link>
+        <% end %>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-700">Show:</span>
+        <%= for per_page <- [10, 20, 50] do %>
+          <.link
+            navigate={@path_func.(Map.merge(@params, %{"per_page" => per_page, "page" => 1}))}
+            class={[
+              "px-2 py-1 text-sm rounded transition-colors",
+              if(String.to_integer(Map.get(@params, "per_page", "10")) == per_page,
+                do: "bg-indigo-100 text-indigo-700 font-medium",
+                else: "text-gray-600 hover:bg-gray-100")
+            ]}
+          >
+            <%= per_page %>
+          </.link>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  # Helper function to generate pagination range
+  defp pagination_range(current_page, total_pages) do
+    cond do
+      total_pages <= 7 ->
+        1..total_pages |> Enum.to_list()
+
+      current_page <= 4 ->
+        [1, 2, 3, 4, 5, :ellipsis, total_pages]
+
+      current_page >= total_pages - 3 ->
+        [1, :ellipsis | Enum.to_list((total_pages - 4)..total_pages)]
+
+      true ->
+        [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
+    end
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

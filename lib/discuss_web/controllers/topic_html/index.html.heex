@@ -26,7 +26,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
-          <span><%= length(@topics) %> <%= if length(@topics) == 1, do: "topic", else: "topics" %> available</span>
+          <span><%= @pagination.total_count %> <%= if @pagination.total_count == 1, do: "topic", else: "topics" %> available</span>
         </div>
       </div>
       
@@ -83,8 +83,19 @@
   </form>
 </div>
 
+<!-- Sorting Controls -->
+<div class="max-w-7xl mx-auto mb-6 px-4 sm:px-6 lg:px-8">
+  <.sorting_controls 
+    current_sort={@current_sort}
+    current_order={@current_order}
+    path_func={&~p"/topics?#{&1}"}
+    params={@params}
+    class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+  />
+</div>
+
 <!-- Topics Grid -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
   <%= if Enum.empty?(@topics) do %>
     <div class="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
       <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -107,10 +118,21 @@
       </.link>
     </div>
   <% else %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <%= for topic <- @topics do %>
         <.topic_card topic={topic} />
       <% end %>
     </div>
   <% end %>
 </div>
+
+<!-- Pagination -->
+<%= if @pagination.total_pages > 1 do %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <.pagination 
+      pagination={@pagination}
+      path_func={&~p"/topics?#{&1}"}
+      params={@params}
+    />
+  </div>
+<% end %>

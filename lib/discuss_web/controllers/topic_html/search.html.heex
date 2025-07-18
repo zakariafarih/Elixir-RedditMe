@@ -19,7 +19,7 @@
     
     <div class="flex items-center justify-between mb-2">
       <p class="text-lg text-gray-600">
-        Found <%= length(@results) %> <%= if length(@results) == 1, do: "topic", else: "topics" %> matching your search
+        Found <%= @pagination.total_count %> <%= if @pagination.total_count == 1, do: "topic", else: "topics" %> matching your search
       </p>
       <.link navigate={~p"/topics"} class="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,10 +57,23 @@
   </form>
 </div>
 
+<!-- Sorting Controls -->
+<%= if @pagination.total_count > 0 do %>
+  <div class="max-w-7xl mx-auto mb-6 px-4 sm:px-6 lg:px-8">
+    <.sorting_controls 
+      current_sort={@current_sort}
+      current_order={@current_order}
+      path_func={&~p"/topics/search?#{&1}"}
+      params={Map.put(@params, "q", @term)}
+      class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+    />
+  </div>
+<% end %>
+
 <!-- Results Section -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
   <%= if length(@results) > 0 do %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <%= for topic <- @results do %>
         <.topic_card topic={topic} />
       <% end %>
@@ -86,6 +99,17 @@
     </div>
   <% end %>
 </div>
+
+<!-- Pagination for Search Results -->
+<%= if @pagination.total_pages > 1 do %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <.pagination 
+      pagination={@pagination}
+      path_func={&~p"/topics/search?#{&1}"}
+      params={Map.put(@params, "q", @term)}
+    />
+  </div>
+<% end %>
 
 
 
