@@ -18,7 +18,8 @@ defmodule DiscussWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    resources "/topics", TopicController
+    get "/about", PageController, :about # This will route the request to the PageController's about action in navbar
+    resources "/topics", TopicController # This will generate  RESTful routes for all topics -> get, post, put, and delete ( index, new, create, show, edit, update, delete )
   end
 
   # Other scopes may use custom stacks.

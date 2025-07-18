@@ -16,4 +16,9 @@ defmodule DiscussWeb.PageController do
     # Render the home.html.heex template, passing topics: topics
     render(conn, :home, topics: topics)
   end
+
+  def about(conn, _params) do
+    # Render the about page
+    render(conn, :about, page_title: "About") # We pass "About" so that <.live_title> in root.html.heex show a proper title tag
+  end
 end
