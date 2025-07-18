@@ -19,6 +19,7 @@ defmodule DiscussWeb.Router do
 
     get "/", PageController, :home
     get "/about", PageController, :about # This will route the request to the PageController's about action in navbar
+    get "/topics/search", TopicController, :search # This will route the request to the TopicController's search action
     resources "/topics", TopicController # This will generate  RESTful routes for all topics -> get, post, put, and delete ( index, new, create, show, edit, update, delete )
   end
 

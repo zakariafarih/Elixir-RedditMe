@@ -1,4 +1,14 @@
-<div class="max-w-2xl mx-auto">
-  <h1 class="text-3xl font-bold mb-4">Edit Topic</h1>
-  <.form_component form={@changeset} action={~p"/topics/#{@topic.id}"} />
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+      Edit Your Topic
+    </h1>
+    <p class="text-lg text-gray-600">
+      Update your discussion to keep the conversation fresh and relevant
+    </p>
+  </div>
+  
+  <!-- Form Container -->
+  <.form_component changeset={@changeset} action={~p"/topics/#{@topic.id}"} />
 </div>

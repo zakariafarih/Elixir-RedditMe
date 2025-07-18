@@ -6,11 +6,28 @@ defmodule DiscussWeb.TopicController do
 
   @doc """
   GET /topics
-  Lists all topics and renders the index page.
+  Lists all topics with pagination and renders the index page.
   """
-  def index(conn, _params) do
-    topics = Content.list_topics()
-    render(conn, :index, topics: topics)
+  def index(conn, params) do
+    page = String.to_integer(Map.get(params, "page", "1"))
+    per_page = String.to_integer(Map.get(params, "per_page", "10"))
+    sort_by = String.to_existing_atom(Map.get(params, "sort_by", "inserted_at"))
+    sort_order = String.to_existing_atom(Map.get(params, "sort_order", "desc"))
+
+    pagination = Content.list_topics_paginated([
+      page: page,
+      per_page: per_page,
+      sort_by: sort_by,
+      sort_order: sort_order
+    ])
+
+    render(conn, :index,
+      topics: pagination.topics,
+      pagination: pagination,
+      current_sort: sort_by,
+      current_order: sort_order,
+      params: params
+    )
   end
 
   @doc """
@@ -88,5 +105,37 @@ defmodule DiscussWeb.TopicController do
     conn
     |> put_flash(:info, "Topic deleted successfully!")
     |> redirect(to: ~p"/topics")
+  end
+
+  @doc """
+  GET /topics/search
+  Searches for topics with pagination based on a query term.
+  """
+  def search(conn, %{"q" => term} = params) do
+    page = String.to_integer(Map.get(params, "page", "1"))
+    per_page = String.to_integer(Map.get(params, "per_page", "10"))
+    sort_by = String.to_existing_atom(Map.get(params, "sort_by", "inserted_at"))
+    sort_order = String.to_existing_atom(Map.get(params, "sort_order", "desc"))
+
+    pagination = Content.search_topics_paginated(term, [
+      page: page,
+      per_page: per_page,
+      sort_by: sort_by,
+      sort_order: sort_order
+    ])
+
+    render(conn, :search,
+      results: pagination.topics,
+      pagination: pagination,
+      current_sort: sort_by,
+      current_order: sort_order,
+      term: term,
+      params: params
+    )
+  end
+
+  def search(conn, _params) do
+    # Redirect to topics index if no search term provided
+    redirect(conn, to: ~p"/topics")
   end
 end
