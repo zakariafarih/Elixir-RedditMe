@@ -1,0 +1,19 @@
+defmodule DiscussWeb.PageController do
+  use DiscussWeb, :controller
+
+  # Bring in our Content context to fetch topics
+  alias Discuss.Content
+
+  @doc """
+  GET /
+  Renders the home page, loading the 5 most recent topics.
+  """
+
+  def home(conn, _params) do
+    # fetch the latest 5 topics, ordered by insertion time descending
+    topics = Content.recent_topics(5)
+
+    # Render the home.html.heex template, passing topics: topics
+    render(conn, :home, topics: topics)
+  end
+end

@@ -1,0 +1,28 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-bold">Topics</h1>
+  <.link navigate={~p"/topics/new"} class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+    New Topic
+  </.link>
+</div>
+
+<%= if Enum.empty?(@topics) do %>
+  <p class="text-gray-600">
+    No topics yet. <.link navigate={~p"/topics/new"} class="underline">Create one?</.link>
+  </p>
+<% else %>
+  <ul class="space-y-4">
+    <%= for topic <- @topics do %>
+      <li class="p-4 bg-white rounded shadow hover:shadow-md transition">
+        <h2 class="text-xl font-semibold">
+          <.link navigate={~p"/topics/#{topic.id}"} class="hover:underline">
+            <%= topic.title %>
+          </.link>
+        </h2>
+        <p class="mt-1 text-gray-500 text-sm">
+          <!-- Simple date; or add Timex if you prefer -->
+          <%= NaiveDateTime.to_date(topic.inserted_at) %>
+        </p>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

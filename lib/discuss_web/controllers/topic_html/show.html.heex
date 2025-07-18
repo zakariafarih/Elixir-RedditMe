@@ -1,0 +1,25 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-bold"><%= @topic.title %></h1>
+  <div class="space-x-2">
+    <.link navigate={~p"/topics/#{@topic.id}/edit"} class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+      Edit
+    </.link>
+    <.link navigate={~p"/topics"} class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+      Back
+    </.link>
+  </div>
+</div>
+
+<div class="prose prose-lg bg-white p-6 rounded shadow">
+  <%= raw @topic.body |> Earmark.as_html!() %>
+</div>
+
+<div class="mt-6">
+  <.button phx-click="delete" phx-value-id={@topic.id} form="delete-topic-form" class="bg-red-600 hover:bg-red-700">
+    Delete Topic
+  </.button>
+
+  <.form for={%{}} action={~p"/topics/#{@topic.id}"} id="delete-topic-form" method="post" class="hidden">
+    <input type="hidden" name="_method" value="delete" />
+  </.form>
+</div>

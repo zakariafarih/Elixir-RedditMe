@@ -1,0 +1,40 @@
+<.flash_group flash={@flash}/>
+
+<section class="text-center mt-12">
+  <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Welcome to Discuss</h2>
+  <p class="text-lg text-gray-600 mb-8">
+    A community‑driven forum where you can post topics, share opinions, and join the conversation.
+  </p>
+  <.link
+    navigate={~p"/topics/new"}
+    class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700"
+  >
+    Start a New Topic
+  </.link>
+</section>
+
+<section class="mt-16">
+  <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recent Topics</h3>
+
+  <%= if Enum.empty?(@topics) do %>
+    <p class="text-gray-600">
+      No topics yet. 
+      <.link navigate={~p"/topics/new"} class="underline">Create the first one.</.link>
+    </p>
+  <% else %>
+    <ul class="space-y-4">
+      <%= for topic <- @topics do %>
+        <li class="p-4 bg-white rounded shadow-sm hover:shadow-md transition">
+          <h4 class="text-lg font-medium text-indigo-600 hover:underline">
+            <.link navigate={~p"/topics/#{topic.id}"}>
+              <%= topic.title %>
+            </.link>
+          </h4>
+          <p class="text-gray-500 text-sm mt-1">
+            Posted <%= NaiveDateTime.to_date(topic.inserted_at) %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
