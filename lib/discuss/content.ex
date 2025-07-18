@@ -50,4 +50,17 @@ defmodule Discuss.Content do
     Repo.delete(topic)
   end
 
+  @doc """
+  Searches for topics by title or body content.
+  Returns a list of topics that match the search term.
+  """
+  def search_topics(term) do
+    pattern = "%#{term}%"
+
+    Topic
+    |> where([t], ilike(t.title, ^pattern) or ilike(t.body, ^pattern))
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
 end

@@ -89,4 +89,13 @@ defmodule DiscussWeb.TopicController do
     |> put_flash(:info, "Topic deleted successfully!")
     |> redirect(to: ~p"/topics")
   end
+
+  @doc """
+  GET /topics/search
+  Searches for topics based on a query term.
+  """
+  def search(conn, %{"q" => term}) do
+    results = Content.search_topics(term)
+    render(conn, :search, results: results, term: term)
+  end
 end

@@ -1,23 +1,103 @@
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-3xl font-bold"><%= @topic.title %></h1>
-  <div class="space-x-2">
-    <.link navigate={~p"/topics/#{@topic.id}/edit"} class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-      Edit
-    </.link>
-    <.link navigate={~p"/topics"} class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-      Back
-    </.link>
+<!-- Topic Header -->
+<div class="bg-gradient-to-r from-indigo-50 via-white to-purple-50 rounded-2xl p-8 mb-8 relative overflow-hidden">
+  <div class="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
+  
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+    <div class="flex-1">
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+        <%= @topic.title %>
+      </h1>
+      <div class="flex items-center space-x-4 text-sm text-gray-600">
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Posted <%= format_date(@topic.inserted_at) %>
+        </div>
+        <%= if @topic.updated_at != @topic.inserted_at do %>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Updated <%= format_date(@topic.updated_at) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="flex flex-wrap gap-3">
+      <.link 
+        navigate={~p"/topics/#{@topic.id}/edit"} 
+        class="inline-flex items-center px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      </.link>
+      <.link 
+        navigate={~p"/topics"} 
+        class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-medium rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Topics
+      </.link>
+    </div>
   </div>
 </div>
 
-<div class="prose prose-lg bg-white p-6 rounded shadow">
-  <%= raw @topic.body |> Earmark.as_html!() %>
+<!-- Topic Content -->
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+  <div class="p-8">
+    <%= if @topic.body && String.trim(@topic.body) != "" do %>
+      <div class="prose prose-lg prose-indigo max-w-none 
+                  prose-headings:text-gray-900 prose-headings:font-bold
+                  prose-p:text-gray-700 prose-p:leading-relaxed
+                  prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline
+                  prose-blockquote:border-indigo-200 prose-blockquote:bg-indigo-50/50 prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:rounded-lg
+                  prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-gray-800
+                  prose-pre:bg-gray-900 prose-pre:text-gray-100
+                  prose-strong:text-gray-900
+                  prose-ul:text-gray-700 prose-ol:text-gray-700
+                  prose-li:marker:text-indigo-500">
+        <%= raw @topic.body |> Earmark.as_html!() %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-gray-500 italic">No content provided for this topic.</p>
+      </div>
+    <% end %>
+  </div>
 </div>
 
-<div class="mt-6">
-  <.button phx-click="delete" phx-value-id={@topic.id} form="delete-topic-form" class="bg-red-600 hover:bg-red-700">
-    Delete Topic
-  </.button>
+<!-- Actions Section -->
+<div class="bg-white rounded-2xl shadow-lg p-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Topic Actions</h3>
+      <p class="text-gray-600 text-sm">Manage this topic or take further actions</p>
+    </div>
+    
+    <div class="flex space-x-3">
+      <.button 
+        phx-click="delete" 
+        phx-value-id={@topic.id} 
+        form="delete-topic-form" 
+        class="inline-flex items-center px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+        data-confirm="Are you sure you want to delete this topic? This action cannot be undone."
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Delete Topic
+      </.button>
+    </div>
+  </div>
 
   <.form for={%{}} action={~p"/topics/#{@topic.id}"} id="delete-topic-form" method="post" class="hidden">
     <input type="hidden" name="_method" value="delete" />
