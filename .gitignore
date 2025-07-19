@@ -35,3 +35,38 @@ discuss-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore environment files with secrets
+.env
+.env.*
+!.env.example
+
+# Ignore deployment packages
+discuss-deployment-*.tar.gz
+
+# Ignore SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.csr
+
+# Ignore database dumps and backups
+*.sql
+*.dump
+db_backup_*
+
+# Ignore Docker volumes and data
+docker-data/
+postgres-data/
+
+# Ignore deployment and infrastructure files with secrets
+docker-compose.override.yml
+secrets/
+certs/
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore temporary deployment files
+READY-TO-DEPLOY.md
+

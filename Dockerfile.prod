@@ -1,0 +1,72 @@
+# Multi-stage production build
+FROM elixir:1.15-otp-26-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    npm \
+    git \
+    python3
+
+# Create app directory
+WORKDIR /app
+
+# Install hex and rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+# Copy mix files
+COPY mix.exs mix.lock ./
+
+# Set production environment
+ENV MIX_ENV=prod
+
+# Install dependencies
+RUN mix deps.get --only=prod
+
+# Copy config files
+COPY config ./config
+
+# Copy assets
+COPY assets ./assets
+
+# Copy priv folder
+COPY priv ./priv
+
+# Copy source code
+COPY lib ./lib
+
+# Compile assets and application
+RUN mix assets.deploy
+RUN mix compile
+
+# Build release
+RUN mix release
+
+# Production stage
+FROM alpine:3.20
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    openssl \
+    ncurses-libs \
+    libstdc++
+
+# Create app user
+RUN addgroup -g 1000 -S app && \
+    adduser -u 1000 -S app -G app
+
+# Create app directory
+WORKDIR /app
+
+# Copy release from builder stage
+COPY --from=builder --chown=app:app /app/_build/prod/rel/discuss ./
+
+# Switch to app user
+USER app
+
+# Expose port
+EXPOSE 4000
+
+# Start the application
+CMD ["./bin/discuss", "start"]

@@ -37,7 +37,9 @@ if config_env() == :prod do
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    socket_options: maybe_ipv6
+    socket_options: maybe_ipv6 ++ [:inet],
+    timeout: 60_000,
+    pool_timeout: 60_000
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -68,16 +70,26 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
-  config :discuss, Discuss.Mailer,
-    adapter: Swoosh.Adapters.SMTP,
-    relay: "smtp.gmail.com",
-    username: System.fetch_env!("GMAIL_USER"),
-    password: System.fetch_env!("GMAIL_APP_PASSWORD"),
-    ssl: true,
-    port: 465,
-    auth: :always,
-    tls: :always,
-    retries: 2
+  # Configure mailer only if credentials are provided
+  gmail_user = System.get_env("GMAIL_USER")
+  gmail_password = System.get_env("GMAIL_APP_PASSWORD")
+
+  if gmail_user && gmail_password do
+    config :discuss, Discuss.Mailer,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: "smtp.gmail.com",
+      username: gmail_user,
+      password: gmail_password,
+      ssl: true,
+      port: 465,
+      auth: :always,
+      tls: :always,
+      retries: 2
+  else
+    # Use test adapter when credentials are not provided
+    config :discuss, Discuss.Mailer,
+      adapter: Swoosh.Adapters.Test
+  end
 
   # ## SSL Support
   #

@@ -1,0 +1,46 @@
+# DEPLOYMENT INSTRUCTIONS FOR REDISCUSSTOPIC.COM
+
+## STEP 1: BASIC VPS SETUP
+1. Upload this package to your VPS
+2. Extract: tar -xzf discuss-deployment-*.tar.gz
+3. Move to /opt/: sudo mv discuss-deployment-* /opt/discuss
+4. Change ownership: sudo chown -R $USER:$USER /opt/discuss
+5. Navigate: cd /opt/discuss
+
+## STEP 2: INSTALL DEPENDENCIES
+./scripts/setup-vps.sh
+
+## STEP 3: SETUP NGINX
+sudo cp nginx/discuss.conf /etc/nginx/sites-available/discuss
+sudo ln -s /etc/nginx/sites-available/discuss /etc/nginx/sites-enabled/
+sudo nginx -t
+
+## STEP 4: SSL CERTIFICATE SETUP
+Setup SSL certificate for rediscusstopic.com:
+sudo certbot --nginx -d rediscusstopic.com -d www.rediscusstopic.com
+
+## STEP 5: DEPLOY APPLICATION
+./deploy.sh deploy
+
+## STEP 6: ACCESS YOUR APP
+https://rediscusstopic.com
+https://www.rediscusstopic.com
+
+## MANAGEMENT COMMANDS:
+./deploy.sh logs      # View logs
+./deploy.sh status    # Check status  
+./deploy.sh restart   # Restart app
+./deploy.sh stop      # Stop app
+./deploy.sh backup-db # Backup database
+
+## TROUBLESHOOTING:
+- Check logs: ./deploy.sh logs
+- Check container status: docker ps
+- Check nginx: sudo nginx -t && sudo systemctl status nginx
+
+## Current configuration:
+- Domain: rediscusstopic.com
+- Database: PostgreSQL with password 'SecureDBPassword123!'
+- App Port: 4000 (internal)
+- HTTPS: Port 443 via nginx
+- SSL: Let's Encrypt certificates

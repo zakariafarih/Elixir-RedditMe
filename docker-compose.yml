@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: discuss_db
+    environment:
+      POSTGRES_DB: discuss_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: discuss_web
+    environment:
+      - MIX_ENV=dev
+      - DATABASE_URL=ecto://postgres:postgres@db:5432/discuss_dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - /app/deps
+      - /app/_build
+    depends_on:
+      db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    command: mix phx.server
+
+  # For running tests with a separate test database
+  test_db:
+    image: postgres:16
+    container_name: discuss_test_db
+    environment:
+      POSTGRES_DB: discuss_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+  test_postgres_data:
