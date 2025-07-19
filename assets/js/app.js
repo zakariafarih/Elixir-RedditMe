@@ -25,10 +25,56 @@ import topbar from "../vendor/topbar"
 // Import our custom markdown editor
 import "./markdown_editor"
 
+// LiveView hooks
+let Hooks = {}
+
+Hooks.CommentForm = {
+  mounted() {
+    console.log("CommentForm hook mounted")
+    
+    // Listen for the clear form event
+    this.handleEvent("clear-comment-form", () => {
+      console.log("Received clear-comment-form event")
+      const textarea = this.el.querySelector('textarea[name="comment[body]"]')
+      if (textarea) {
+        console.log("Clearing textarea, current value:", textarea.value)
+        textarea.value = ''
+        textarea.focus()
+        // Trigger input event to ensure LiveView knows the value changed
+        textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        console.log("Textarea cleared")
+      } else {
+        console.log("Textarea not found")
+      }
+    })
+  },
+  
+  updated() {
+    console.log("CommentForm updated")
+    // Force clear the textarea if it still has content after a successful submission
+    const textarea = this.el.querySelector('textarea[name="comment[body]"]')
+    if (textarea && textarea.value.trim() !== '') {
+      // Check if there's a success flash message, which indicates successful submission
+      const flashMessages = document.querySelectorAll('[data-phx-flash]')
+      const hasSuccessMessage = Array.from(flashMessages).some(msg => 
+        msg.textContent.includes('Comment added!')
+      )
+      
+      if (hasSuccessMessage) {
+        console.log("Success message detected, clearing textarea")
+        textarea.value = ''
+        textarea.focus()
+        textarea.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+    }
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

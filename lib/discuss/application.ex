@@ -12,6 +12,8 @@ defmodule Discuss.Application do
       Discuss.Repo,
       {DNSCluster, query: Application.get_env(:discuss, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Discuss.PubSub},
+      # Start Phoenix Presence
+      DiscussWeb.Presence,
       # Start the Finch HTTP client for sending emails
       {Finch, name: Discuss.Finch},
       # Start a worker by calling: Discuss.Worker.start_link(arg)

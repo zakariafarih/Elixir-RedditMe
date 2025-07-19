@@ -16,6 +16,9 @@ import Config
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
+
+config :swoosh, :api_client, false
+
 if System.get_env("PHX_SERVER") do
   config :discuss, DiscussWeb.Endpoint, server: true
 end
@@ -64,6 +67,17 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  config :discuss, Discuss.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: "smtp.gmail.com",
+    username: System.fetch_env!("GMAIL_USER"),
+    password: System.fetch_env!("GMAIL_APP_PASSWORD"),
+    ssl: true,
+    port: 465,
+    auth: :always,
+    tls: :always,
+    retries: 2
 
   # ## SSL Support
   #

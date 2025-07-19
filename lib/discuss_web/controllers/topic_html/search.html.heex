@@ -75,7 +75,7 @@
   <%= if length(@results) > 0 do %>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <%= for topic <- @results do %>
-        <.topic_card topic={topic} />
+        <.topic_card topic={topic} current_user={@current_user} />
       <% end %>
     </div>
   <% else %>

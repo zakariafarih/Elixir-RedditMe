@@ -5,8 +5,9 @@ defmodule Discuss.Content.Topic do
   schema "topics" do
     field :title, :string
     field :body, :string
-    # We just add this association for now, Waiting for next milestone to implement User authentication fully
     belongs_to :user, Discuss.Accounts.User
+    has_many :comments, Discuss.Content.Comment
+    has_many :votes, Discuss.Content.Vote
     timestamps()
   end
 
